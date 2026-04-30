@@ -1,0 +1,20 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# 환경변수 (중요!)
+.env
+application-local.yml
+application-secret.yml
+
+# Mac
+.DS_Store
+
+# 로그
+*.log
