@@ -1,3 +1,7 @@
 spring:
   application:
     name: server
+
+ai:
+  server:
+    url: ${AI_SERVER}
