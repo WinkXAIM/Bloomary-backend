@@ -3,14 +3,15 @@ package com.flowary.server.flower;
 import com.flowary.server.ai.AiClient;
 import com.flowary.server.ai.dto.AiDetectResponse;
 import com.flowary.server.ai.dto.DetectedObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -19,15 +20,19 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(FlowerController.class)
-@Import(FlowerService.class)
+@ExtendWith(MockitoExtension.class)
 class FlowerControllerTest {
 
-    @Autowired
+    @Mock
+    private AiClient aiClient;
+
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private AiClient aiClient;
+    @BeforeEach
+    void setUp() {
+        FlowerService flowerService = new FlowerService(aiClient);
+        mockMvc = MockMvcBuilders.standaloneSetup(new FlowerController(flowerService)).build();
+    }
 
     @Test
     void detectFlowers_returns_mapped_flowers() throws Exception {
