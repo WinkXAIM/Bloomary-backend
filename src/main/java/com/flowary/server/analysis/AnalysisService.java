@@ -2,11 +2,12 @@ package com.flowary.server.analysis;
 
 import com.flowary.server.ai.AiClient;
 import com.flowary.server.ai.dto.AiCombineResponse;
+import com.flowary.server.ai.dto.FlowerInput;
 import com.flowary.server.analysis.dto.AnalysisFlowerItem;
+import com.flowary.server.analysis.dto.AnalysisFlowerRequest;
 import com.flowary.server.analysis.dto.AnalysisResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,13 +18,18 @@ public class AnalysisService {
     private final AiClient aiClient;
     private final AnalysisRepository analysisRepository;
 
-    public AnalysisResponse createAnalysis(MultipartFile image, List<String> flowerNames) {
-        AiCombineResponse aiResponse = aiClient.combineFloriography(flowerNames);
+    public AnalysisResponse createAnalysis(List<AnalysisFlowerRequest> flowerRequests) {
+        List<FlowerInput> flowerInputs = flowerRequests.stream()
+                .map(f -> new FlowerInput(f.nameKo(), f.nameEn(), f.meaning()))
+                .toList();
 
-        List<AnalysisFlower> flowers = aiResponse.individualMeanings().stream()
-                .map(m -> AnalysisFlower.builder()
-                        .name(m.nameKo())
-                        .meaning(m.meaning())
+        AiCombineResponse aiResponse = aiClient.combineFloriography(flowerInputs);
+
+        List<AnalysisFlower> flowers = flowerRequests.stream()
+                .map(f -> AnalysisFlower.builder()
+                        .nameKo(f.nameKo())
+                        .nameEn(f.nameEn())
+                        .meaning(f.meaning())
                         .build())
                 .toList();
 
@@ -37,7 +43,7 @@ public class AnalysisService {
         Analysis saved = analysisRepository.save(analysis);
 
         List<AnalysisFlowerItem> flowerItems = saved.getFlowers().stream()
-                .map(f -> new AnalysisFlowerItem(f.getName(), f.getMeaning()))
+                .map(f -> new AnalysisFlowerItem(f.getNameKo(), f.getNameEn(), f.getMeaning()))
                 .toList();
 
         return new AnalysisResponse(

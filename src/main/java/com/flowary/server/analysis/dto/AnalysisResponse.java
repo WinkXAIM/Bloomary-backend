@@ -8,6 +8,6 @@ public record AnalysisResponse(
         String summary,
         String content,
         String story,
-        List<AnalysisFlowerItem> flowers,
+        List<AnalysisFlowerItem> flowerMeanings,
         LocalDateTime createdAt
 ) {}

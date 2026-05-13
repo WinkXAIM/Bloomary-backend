@@ -14,3 +14,7 @@ spring:
 ai:
   server:
     url: ${AI_SERVER}
+
+upload:
+  temp-dir: uploads/temp
+  expiry-hours: 1

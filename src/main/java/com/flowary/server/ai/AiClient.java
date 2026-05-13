@@ -3,6 +3,7 @@ package com.flowary.server.ai;
 import com.flowary.server.ai.dto.AiCombineRequest;
 import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.AiDetectResponse;
+import com.flowary.server.ai.dto.FlowerInput;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -55,11 +56,11 @@ public class AiClient {
                 .body(AiDetectResponse.class);
     }
 
-    public AiCombineResponse combineFloriography(List<String> flowerNames) {
+    public AiCombineResponse combineFloriography(List<FlowerInput> flowers) {
         return restClient.post()
                 .uri("/ai/combine-floriography")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new AiCombineRequest(flowerNames))
+                .body(new AiCombineRequest(flowers))
                 .retrieve()
                 .body(AiCombineResponse.class);
     }

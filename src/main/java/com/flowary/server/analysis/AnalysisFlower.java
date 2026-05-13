@@ -18,7 +18,9 @@ public class AnalysisFlower {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String nameKo;
+
+    private String nameEn;
 
     @Column(columnDefinition = "TEXT")
     private String meaning;

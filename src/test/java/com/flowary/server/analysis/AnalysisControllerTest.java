@@ -1,8 +1,10 @@
 package com.flowary.server.analysis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flowary.server.ai.AiClient;
 import com.flowary.server.ai.dto.AiCombineResponse;
-import com.flowary.server.ai.dto.IndividualMeaning;
+import com.flowary.server.ai.dto.FlowerInput;
+import com.flowary.server.analysis.dto.AnalysisFlowerRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,24 +34,27 @@ class AnalysisControllerTest {
     private AnalysisRepository analysisRepository;
 
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         AnalysisService analysisService = new AnalysisService(aiClient, analysisRepository);
         mockMvc = MockMvcBuilders.standaloneSetup(new AnalysisController(analysisService)).build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
     void createAnalysis_returns_201_with_analysis_data() throws Exception {
-        given(aiClient.combineFloriography(eq(List.of("Rose", "Tulip"))))
+        List<FlowerInput> expectedInputs = List.of(
+                new FlowerInput("장미", "Rose", "사랑"),
+                new FlowerInput("튤립", "Tulip", "희망")
+        );
+
+        given(aiClient.combineFloriography(eq(expectedInputs)))
                 .willReturn(new AiCombineResponse(
                         "당신의 사랑은 영원합니다",
                         "Your love blooms eternally",
-                        "A bouquet of love and hope",
-                        List.of(
-                                new IndividualMeaning("장미", "사랑"),
-                                new IndividualMeaning("튤립", "희망")
-                        )
+                        "A bouquet of love and hope"
                 ));
 
         Analysis savedAnalysis = Analysis.builder()
@@ -58,43 +63,48 @@ class AnalysisControllerTest {
                 .content("당신의 사랑은 영원합니다")
                 .story("Your love blooms eternally")
                 .flowers(List.of(
-                        AnalysisFlower.builder().id(1L).name("장미").meaning("사랑").build(),
-                        AnalysisFlower.builder().id(2L).name("튤립").meaning("희망").build()
+                        AnalysisFlower.builder().id(1L).nameKo("장미").nameEn("Rose").meaning("사랑").build(),
+                        AnalysisFlower.builder().id(2L).nameKo("튤립").nameEn("Tulip").meaning("희망").build()
                 ))
                 .createdAt(LocalDateTime.of(2026, 5, 11, 12, 0, 0))
                 .build();
 
         given(analysisRepository.save(any())).willReturn(savedAnalysis);
 
-        MockMultipartFile image = new MockMultipartFile(
-                "image", "bouquet.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[]{1, 2, 3}
+        List<AnalysisFlowerRequest> flowerRequests = List.of(
+                new AnalysisFlowerRequest("장미", "Rose", "사랑"),
+                new AnalysisFlowerRequest("튤립", "Tulip", "희망")
         );
 
-        mockMvc.perform(multipart("/analyses")
-                        .file(image)
-                        .param("flowers", "Rose", "Tulip"))
+        MockMultipartFile flowers = new MockMultipartFile(
+                "flowers", "", MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(flowerRequests)
+        );
+
+        mockMvc.perform(multipart("/analyses").file(flowers))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.summary").value("A bouquet of love and hope"))
                 .andExpect(jsonPath("$.content").value("당신의 사랑은 영원합니다"))
                 .andExpect(jsonPath("$.story").value("Your love blooms eternally"))
-                .andExpect(jsonPath("$.flowers").isArray())
-                .andExpect(jsonPath("$.flowers.length()").value(2))
-                .andExpect(jsonPath("$.flowers[0].name").value("장미"))
-                .andExpect(jsonPath("$.flowers[0].meaning").value("사랑"))
-                .andExpect(jsonPath("$.flowers[1].name").value("튤립"))
-                .andExpect(jsonPath("$.flowers[1].meaning").value("희망"))
+                .andExpect(jsonPath("$.flowerMeanings").isArray())
+                .andExpect(jsonPath("$.flowerMeanings.length()").value(2))
+                .andExpect(jsonPath("$.flowerMeanings[0].nameKo").value("장미"))
+                .andExpect(jsonPath("$.flowerMeanings[0].nameEn").value("Rose"))
+                .andExpect(jsonPath("$.flowerMeanings[0].meaning").value("사랑"))
+                .andExpect(jsonPath("$.flowerMeanings[1].nameKo").value("튤립"))
+                .andExpect(jsonPath("$.flowerMeanings[1].nameEn").value("Tulip"))
+                .andExpect(jsonPath("$.flowerMeanings[1].meaning").value("희망"))
                 .andExpect(jsonPath("$.createdAt").exists());
     }
 
     @Test
-    void createAnalysis_returns_empty_flowers_when_ai_returns_none() throws Exception {
+    void createAnalysis_returns_empty_flowerMeanings_when_no_flowers_given() throws Exception {
         given(aiClient.combineFloriography(any()))
                 .willReturn(new AiCombineResponse(
                         "조화로운 꽃다발",
                         "A harmonious bouquet",
-                        "Harmony",
-                        List.of()
+                        "Harmony"
                 ));
 
         Analysis savedAnalysis = Analysis.builder()
@@ -108,16 +118,15 @@ class AnalysisControllerTest {
 
         given(analysisRepository.save(any())).willReturn(savedAnalysis);
 
-        MockMultipartFile image = new MockMultipartFile(
-                "image", "bouquet.jpg", MediaType.IMAGE_JPEG_VALUE, new byte[]{1}
+        MockMultipartFile flowers = new MockMultipartFile(
+                "flowers", "", MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsBytes(List.of())
         );
 
-        mockMvc.perform(multipart("/analyses")
-                        .file(image)
-                        .param("flowers", "Rose"))
+        mockMvc.perform(multipart("/analyses").file(flowers))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value("2"))
-                .andExpect(jsonPath("$.flowers").isArray())
-                .andExpect(jsonPath("$.flowers.length()").value(0));
+                .andExpect(jsonPath("$.flowerMeanings").isArray())
+                .andExpect(jsonPath("$.flowerMeanings.length()").value(0));
     }
 }

@@ -26,19 +26,22 @@ class FlowerControllerTest {
     @Mock
     private AiClient aiClient;
 
+    @Mock
+    private TempFileStore tempFileStore;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        FlowerService flowerService = new FlowerService(aiClient);
+        FlowerService flowerService = new FlowerService(aiClient, tempFileStore);
         mockMvc = MockMvcBuilders.standaloneSetup(new FlowerController(flowerService)).build();
     }
 
     @Test
     void detectFlowers_returns_mapped_flowers() throws Exception {
         given(aiClient.detectFlowers(any())).willReturn(new AiDetectResponse(List.of(
-                new DetectedObject("장미", "Rose", List.of(10, 20, 100, 200)),
-                new DetectedObject("튤립", "Tulip", List.of(150, 30, 250, 180))
+                new DetectedObject("장미", "Rose", "사랑", List.of(10, 20, 100, 200)),
+                new DetectedObject("튤립", "Tulip", "영원한 사랑", List.of(150, 30, 250, 180))
         )));
 
         MockMultipartFile image = new MockMultipartFile(
@@ -49,12 +52,16 @@ class FlowerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flowers").isArray())
                 .andExpect(jsonPath("$.flowers.length()").value(2))
-                .andExpect(jsonPath("$.flowers[0].name").value("장미"))
+                .andExpect(jsonPath("$.flowers[0].nameKo").value("장미"))
+                .andExpect(jsonPath("$.flowers[0].nameEn").value("Rose"))
+                .andExpect(jsonPath("$.flowers[0].meaning").value("사랑"))
                 .andExpect(jsonPath("$.flowers[0].box2d[0]").value(10))
                 .andExpect(jsonPath("$.flowers[0].box2d[1]").value(20))
                 .andExpect(jsonPath("$.flowers[0].box2d[2]").value(100))
                 .andExpect(jsonPath("$.flowers[0].box2d[3]").value(200))
-                .andExpect(jsonPath("$.flowers[1].name").value("튤립"))
+                .andExpect(jsonPath("$.flowers[1].nameKo").value("튤립"))
+                .andExpect(jsonPath("$.flowers[1].nameEn").value("Tulip"))
+                .andExpect(jsonPath("$.flowers[1].meaning").value("영원한 사랑"))
                 .andExpect(jsonPath("$.flowers[1].box2d[0]").value(150))
                 .andExpect(jsonPath("$.flowers[1].box2d[1]").value(30))
                 .andExpect(jsonPath("$.flowers[1].box2d[2]").value(250))
