@@ -1,5 +1,9 @@
 package com.flowary.server.analysis;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AnalysisRepository extends JpaRepository<Analysis, Long> {}
+@Repository
+public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
+
+}
