@@ -1,3 +1,20 @@
 spring:
   application:
     name: server
+  datasource:
+    url: jdbc:mysql://localhost:3306/bloomary?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+ai:
+  server:
+    url: ${AI_SERVER}
+
+upload:
+  temp-dir: uploads/temp
+  expiry-hours: 1

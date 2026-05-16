@@ -1,0 +1,58 @@
+package com.flowary.server.analysis;
+
+import com.flowary.server.ai.AiClient;
+import com.flowary.server.ai.dto.AiCombineResponse;
+import com.flowary.server.ai.dto.FlowerInput;
+import com.flowary.server.analysis.dto.AnalysisFlowerItem;
+import com.flowary.server.analysis.dto.AnalysisFlowerRequest;
+import com.flowary.server.analysis.dto.AnalysisResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class AnalysisService {
+
+    private final AiClient aiClient;
+    private final AnalysisRepository analysisRepository;
+
+    public AnalysisResponse createAnalysis(List<AnalysisFlowerRequest> flowerRequests) {
+        List<FlowerInput> flowerInputs = flowerRequests.stream()
+                .map(f -> new FlowerInput(f.nameKo(), f.nameEn(), f.meaning()))
+                .toList();
+
+        AiCombineResponse aiResponse = aiClient.combineFloriography(flowerInputs);
+
+        List<AnalysisFlower> flowers = flowerRequests.stream()
+                .map(f -> AnalysisFlower.builder()
+                        .nameKo(f.nameKo())
+                        .nameEn(f.nameEn())
+                        .meaning(f.meaning())
+                        .build())
+                .toList();
+
+        Analysis analysis = Analysis.builder()
+                .summary(aiResponse.summaryEn())
+                .content(aiResponse.combinedMessageKo())
+                .story(aiResponse.storyPreviewEn())
+                .flowers(flowers)
+                .build();
+
+        Analysis saved = analysisRepository.save(analysis);
+
+        List<AnalysisFlowerItem> flowerItems = saved.getFlowers().stream()
+                .map(f -> new AnalysisFlowerItem(f.getNameKo(), f.getNameEn(), f.getMeaning()))
+                .toList();
+
+        return new AnalysisResponse(
+                String.valueOf(saved.getId()),
+                saved.getSummary(),
+                saved.getContent(),
+                saved.getStory(),
+                flowerItems,
+                saved.getCreatedAt()
+        );
+    }
+}
