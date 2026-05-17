@@ -17,4 +17,5 @@ ai:
 
 upload:
   temp-dir: uploads/temp
+  flowers-dir: uploads/flowers
   expiry-hours: 1

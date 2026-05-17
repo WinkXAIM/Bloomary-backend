@@ -63,8 +63,8 @@ class AnalysisControllerTest {
                 .content("당신의 사랑은 영원합니다")
                 .story("Your love blooms eternally")
                 .flowers(List.of(
-                        AnalysisFlower.builder().id(1L).nameKo("장미").nameEn("Rose").meaning("사랑").build(),
-                        AnalysisFlower.builder().id(2L).nameKo("튤립").nameEn("Tulip").meaning("희망").build()
+                        AnalysisFlower.builder().flowerId(1L).nameKo("장미").nameEn("Rose").meaning("사랑").build(),
+                        AnalysisFlower.builder().flowerId(2L).nameKo("튤립").nameEn("Tulip").meaning("희망").build()
                 ))
                 .createdAt(LocalDateTime.of(2026, 5, 11, 12, 0, 0))
                 .build();

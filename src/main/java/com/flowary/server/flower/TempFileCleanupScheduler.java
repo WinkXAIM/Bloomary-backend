@@ -9,20 +9,22 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class TempFileCleanupScheduler {
 
     private final TempFileStore tempFileStore;
+    private final long expiryHours;
 
-    @Value("${upload.expiry-hours}")
-    private long expiryHours;
+    public TempFileCleanupScheduler(TempFileStore tempFileStore,
+                                    @Value("${upload.expiry-hours}") long expiryHours) {
+        this.tempFileStore = tempFileStore;
+        this.expiryHours = expiryHours;
+    }
 
     @Scheduled(fixedRate = 600_000) // 10분마다 실행
     public void cleanExpiredFiles() throws IOException {
@@ -38,8 +40,7 @@ public class TempFileCleanupScheduler {
 
     private boolean isExpired(Path path, Instant expireBefore) {
         try {
-            BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
-            return attrs.creationTime().toInstant().isBefore(expireBefore);
+            return Files.getLastModifiedTime(path).toInstant().isBefore(expireBefore);
         } catch (IOException e) {
             return false;
         }
