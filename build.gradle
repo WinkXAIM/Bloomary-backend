@@ -31,6 +31,7 @@ dependencies {
 	testImplementation 'com.fasterxml.jackson.core:jackson-databind'
 	testCompileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	mockitoAgent('org.mockito:mockito-core') { transitive = false }
 }
