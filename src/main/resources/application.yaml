@@ -15,7 +15,7 @@ spring:
 
 ai:
   server:
-    url: ${AI_SERVER:http://localhost:8000}
+    url: ${AI_SERVER:}
 
 upload:
   temp-dir: uploads/temp
