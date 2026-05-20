@@ -9,7 +9,6 @@ build/
 *.ipr
 
 # 환경변수 (중요!)
-.env
 application-local.yml
 application-secret.yml
 
@@ -18,3 +17,6 @@ application-secret.yml
 
 # 로그
 *.log
+
+# 업로드 임시 파일
+uploads/
