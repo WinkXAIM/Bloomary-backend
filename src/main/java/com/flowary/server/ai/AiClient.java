@@ -4,7 +4,6 @@ import com.flowary.server.ai.dto.AiCombineRequest;
 import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.AiDetectResponse;
 import com.flowary.server.ai.dto.FlowerInput;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,9 +22,9 @@ public class AiClient {
 
     private final RestClient restClient;
 
-    public AiClient(@Value("${ai.server.url}") String aiServerUrl) {
+    public AiClient(AiProperties aiProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(aiServerUrl)
+                .baseUrl(aiProperties.url())
                 .build();
     }
 

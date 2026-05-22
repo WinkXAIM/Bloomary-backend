@@ -1,6 +1,5 @@
 package com.flowary.server.flower;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +15,8 @@ public class FlowerImageStore {
 
     private final Path flowersDir;
 
-    public FlowerImageStore(@Value("${upload.flowers-dir}") String flowersDirPath) throws IOException {
-        this.flowersDir = Paths.get(flowersDirPath).toAbsolutePath();
+    public FlowerImageStore(UploadProperties uploadProperties) throws IOException {
+        this.flowersDir = Paths.get(uploadProperties.flowersDir()).toAbsolutePath();
         Files.createDirectories(this.flowersDir);
     }
 

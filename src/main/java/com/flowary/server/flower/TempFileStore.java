@@ -1,6 +1,5 @@
 package com.flowary.server.flower;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,8 +15,8 @@ public class TempFileStore {
 
     private final Path tempDir;
 
-    public TempFileStore(@Value("${upload.temp-dir}") String tempDirPath) throws IOException {
-        this.tempDir = Paths.get(tempDirPath).toAbsolutePath();
+    public TempFileStore(UploadProperties uploadProperties) throws IOException {
+        this.tempDir = Paths.get(uploadProperties.tempDir()).toAbsolutePath();
         Files.createDirectories(this.tempDir);
     }
 
