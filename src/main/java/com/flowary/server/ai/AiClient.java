@@ -11,6 +11,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,16 +19,20 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.List;
 
 @Component
 public class AiClient {
-
     private final RestClient restClient;
 
     public AiClient(@Value("${ai.server.url}") String aiServerUrl) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
         this.restClient = RestClient.builder()
                 .baseUrl(aiServerUrl)
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
                 .build();
     }
 
@@ -52,7 +57,6 @@ public class AiClient {
 
         return restClient.post()
                 .uri("/ai/detect-flowers")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
                 .retrieve()
                 .body(AiDetectResponse.class);
@@ -70,7 +74,6 @@ public class AiClient {
     public AiRecommendResponse recommend(String userSituation) {
         return restClient.post()
                 .uri("/ai/recommend-bouquet")
-                .contentType(MediaType.APPLICATION_JSON)
                 .body(new AiRecommendRequest(userSituation))
                 .retrieve()
                 .body(AiRecommendResponse.class);
