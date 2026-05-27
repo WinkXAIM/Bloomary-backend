@@ -3,6 +3,8 @@ package com.flowary.server.ai;
 import com.flowary.server.ai.dto.AiCombineRequest;
 import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.AiDetectResponse;
+import com.flowary.server.ai.dto.AiRecommendRequest;
+import com.flowary.server.ai.dto.AiRecommendResponse;
 import com.flowary.server.ai.dto.FlowerInput;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -63,5 +65,14 @@ public class AiClient {
                 .body(new AiCombineRequest(flowers))
                 .retrieve()
                 .body(AiCombineResponse.class);
+    }
+
+    public AiRecommendResponse recommend(String userSituation) {
+        return restClient.post()
+                .uri("/ai/recommend-bouquet")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new AiRecommendRequest(userSituation))
+                .retrieve()
+                .body(AiRecommendResponse.class);
     }
 }
