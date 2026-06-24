@@ -9,5 +9,6 @@ public record AnalysisResponse(
         String content,
         String story,
         List<AnalysisFlowerItem> flowerMeanings,
+        String imgUrl,
         LocalDateTime createdAt
 ) {}

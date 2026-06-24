@@ -1,6 +1,7 @@
 package com.flowary.server.auth;
 
 import com.flowary.server.auth.dto.TokenResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -57,5 +59,11 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .location(URI.create(kakaoProperties.clientRedirectUri()))
                 .build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, Long>> me(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute(JwtAuthFilter.USER_ID_ATTRIBUTE);
+        return ResponseEntity.ok(Map.of("userId", userId));
     }
 }
