@@ -1,8 +1,6 @@
 package com.flowary.server.flower;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +18,9 @@ public class TempFileCleanupScheduler {
     private final TempFileStore tempFileStore;
     private final long expiryHours;
 
-    public TempFileCleanupScheduler(TempFileStore tempFileStore,
-                                    @Value("${upload.expiry-hours}") long expiryHours) {
+    public TempFileCleanupScheduler(TempFileStore tempFileStore, UploadProperties uploadProperties) {
         this.tempFileStore = tempFileStore;
-        this.expiryHours = expiryHours;
+        this.expiryHours = uploadProperties.expiryHours();
     }
 
     @Scheduled(fixedRate = 600_000) // 10분마다 실행

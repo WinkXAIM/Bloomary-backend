@@ -1,3 +1,3 @@
 package com.flowary.server.ai.dto;
 
-public record FlowerInput(String NameKo, String NameEn, String meaning) {}
+public record FlowerInput(String nameKo, String nameEn, String meaning) {}

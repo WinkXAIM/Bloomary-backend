@@ -30,6 +30,12 @@ public class Analysis {
     @Column(columnDefinition = "TEXT")
     private String story;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "img_url")
+    private String imgUrl;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "analysis_id", nullable = false)
     private List<AnalysisFlower> flowers;

@@ -4,11 +4,11 @@ import com.flowary.server.ai.dto.AiCombineRequest;
 import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.AiDetectResponse;
 import com.flowary.server.ai.dto.FlowerInput;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.util.List;
 
 @Component
@@ -23,9 +24,13 @@ public class AiClient {
 
     private final RestClient restClient;
 
-    public AiClient(@Value("${ai.server.url}") String aiServerUrl) {
+    public AiClient(AiProperties aiProperties) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
         this.restClient = RestClient.builder()
-                .baseUrl(aiServerUrl)
+                .baseUrl(aiProperties.url())
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
                 .build();
     }
 
