@@ -3,6 +3,8 @@ package com.flowary.server.ai;
 import com.flowary.server.ai.dto.AiCombineRequest;
 import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.AiDetectResponse;
+import com.flowary.server.ai.dto.AiRecommendRequest;
+import com.flowary.server.ai.dto.AiRecommendResponse;
 import com.flowary.server.ai.dto.FlowerInput;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -21,9 +23,8 @@ import java.util.List;
 
 @Component
 public class AiClient {
-
     private final RestClient restClient;
-
+  
     public AiClient(AiProperties aiProperties) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
@@ -55,7 +56,6 @@ public class AiClient {
 
         return restClient.post()
                 .uri("/ai/detect-flowers")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(body)
                 .retrieve()
                 .body(AiDetectResponse.class);
@@ -68,5 +68,13 @@ public class AiClient {
                 .body(new AiCombineRequest(flowers))
                 .retrieve()
                 .body(AiCombineResponse.class);
+    }
+
+    public AiRecommendResponse recommend(String userSituation) {
+        return restClient.post()
+                .uri("/ai/recommend-bouquet")
+                .body(new AiRecommendRequest(userSituation))
+                .retrieve()
+                .body(AiRecommendResponse.class);
     }
 }
