@@ -73,6 +73,7 @@ public class AiClient {
     public AiRecommendResponse recommend(String userSituation) {
         return restClient.post()
                 .uri("/ai/recommend-bouquet")
+                .contentType(MediaType.APPLICATION_JSON)
                 .body(new AiRecommendRequest(userSituation))
                 .retrieve()
                 .body(AiRecommendResponse.class);
