@@ -1,6 +1,8 @@
 package com.flowary.server.flower;
 
+import com.flowary.server.auth.JwtAuthFilter;
 import com.flowary.server.flower.dto.FlowerResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +21,11 @@ public class FlowerController {
     private final FlowerService flowerService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FlowerResponse detectFlowers(@RequestParam("image") MultipartFile image) throws IOException {
-        return flowerService.detectFlowers(image);
+    public FlowerResponse detectFlowers(
+            HttpServletRequest request,
+            @RequestParam("image") MultipartFile image
+    ) throws IOException {
+        Long userId = (Long) request.getAttribute(JwtAuthFilter.USER_ID_ATTRIBUTE);
+        return flowerService.detectFlowers(image, userId);
     }
 }

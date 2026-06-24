@@ -1,5 +1,79 @@
 # Flowary-backend
 
+## 로컬 실행 환경 설정
+
+### 요구 사항
+
+| 항목 | 버전 |
+|------|------|
+| Java | 25 |
+| Spring Boot | 4.0.6 |
+| MySQL | 8.x |
+| Gradle | Wrapper 사용 (별도 설치 불필요) |
+
+---
+
+### 1. MySQL DB 설정
+
+```sql
+CREATE DATABASE bloomary CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+root 비밀번호가 있다면 `application-local.yml`의 `DB_PASSWORD`에 입력합니다.
+
+---
+
+### 2. application-local.yml 생성
+
+`src/main/resources/application-local.yml` 파일을 직접 생성합니다. (`.gitignore`에 포함되어 있으므로 git에 커밋되지 않습니다.)
+
+```yaml
+DB_HOST: localhost
+DB_PORT: 3306
+DB_NAME: bloomary
+DB_PASSWORD: (MySQL root 비밀번호, 없으면 빈 값)
+
+ai:
+  server:
+    url: http://localhost:8000
+
+kakao:
+  rest-api-key: (카카오 REST API 키)
+  redirect-uri: http://127.0.0.1:8080/auth/kakao/callback
+  clientRedirectUri: http://127.0.0.1:5174/home
+  clientSecret: (카카오 Client Secret)
+
+JWT_SECRET: (아래 명령어로 생성한 값)
+```
+
+#### JWT_SECRET 생성
+
+터미널에서 아래 명령어를 실행해 안전한 시크릿을 생성합니다.
+
+```bash
+openssl rand -base64 64
+```
+
+출력된 값을 `JWT_SECRET`에 그대로 붙여넣습니다.
+
+#### 카카오 OAuth 앱 설정
+
+[카카오 개발자 콘솔](https://developers.kakao.com)에서 앱을 생성한 뒤:
+
+- **REST API 키** → `rest-api-key`
+- **Client Secret** → `clientSecret` (보안 탭에서 활성화 후 발급)
+- Redirect URI에 `http://127.0.0.1:8080/auth/kakao/callback` 등록
+
+---
+
+### 3. 실행
+
+```bash
+./gradlew bootRun
+```
+
+---
+
 ## 협업 방식
 
 이 프로젝트는 **GitHub Flow**를 기반으로 협업합니다.

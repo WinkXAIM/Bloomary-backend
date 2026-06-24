@@ -15,7 +15,17 @@ spring:
 
 ai:
   server:
-    url: ${AI_SERVER:http://localhost:8000}
+    url: ${AI_SERVER:}
+
+kakao:
+  rest-api-key: ${KAKAO_REST_API_KEY:}
+  redirect-uri: ${KAKAO_REDIRECT_URI:}
+  client-redirect-uri: ${KAKAO_CLIENT_REDIRECT_URI:}
+
+jwt:
+  secret: ${JWT_SECRET:}
+  access-token-expiry: 1800000
+  refresh-token-expiry: 604800000
 
 upload:
   temp-dir: uploads/temp

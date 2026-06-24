@@ -6,7 +6,6 @@ import com.flowary.server.ai.dto.AiDetectResponse;
 import com.flowary.server.ai.dto.AiRecommendRequest;
 import com.flowary.server.ai.dto.AiRecommendResponse;
 import com.flowary.server.ai.dto.FlowerInput;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,13 +24,13 @@ import java.util.List;
 @Component
 public class AiClient {
     private final RestClient restClient;
-
-    public AiClient(@Value("${ai.server.url}") String aiServerUrl) {
+  
+    public AiClient(AiProperties aiProperties) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
         this.restClient = RestClient.builder()
-                .baseUrl(aiServerUrl)
+                .baseUrl(aiProperties.url())
                 .requestFactory(new JdkClientHttpRequestFactory(httpClient))
                 .build();
     }

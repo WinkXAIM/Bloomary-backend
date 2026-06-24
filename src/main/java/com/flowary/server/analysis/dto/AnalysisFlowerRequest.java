@@ -1,3 +1,5 @@
 package com.flowary.server.analysis.dto;
 
-public record AnalysisFlowerRequest(String nameKo, String nameEn, String meaning) {}
+import java.util.List;
+
+public record AnalysisFlowerRequest(String nameKo, String nameEn, String meaning, List<Integer> box2d) {}
