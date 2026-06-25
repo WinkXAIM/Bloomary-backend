@@ -5,6 +5,7 @@ import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.FlowerInput;
 import com.flowary.server.analysis.dto.AnalysisFlowerItem;
 import com.flowary.server.analysis.dto.AnalysisFlowerRequest;
+import com.flowary.server.analysis.dto.AnalysisListItem;
 import com.flowary.server.analysis.dto.AnalysisPageResponse;
 import com.flowary.server.analysis.dto.AnalysisResponse;
 import com.flowary.server.flower.FlowerImageStore;
@@ -58,21 +59,13 @@ public class AnalysisService {
         PageRequest pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Analysis> result = analysisRepository.findByUserId(userId, pageable);
 
-        List<AnalysisResponse> analyses = result.getContent().stream()
-                .map(analysis -> {
-                    List<AnalysisFlowerItem> flowerItems = analysis.getFlowers().stream()
-                            .map(f -> new AnalysisFlowerItem(f.getNameKo(), f.getNameEn(), f.getMeaning()))
-                            .toList();
-                    return new AnalysisResponse(
-                            String.valueOf(analysis.getId()),
-                            analysis.getSummary(),
-                            analysis.getContent(),
-                            analysis.getStory(),
-                            flowerItems,
-                            analysis.getImgUrl(),
-                            analysis.getCreatedAt()
-                    );
-                })
+        List<AnalysisListItem> analyses = result.getContent().stream()
+                .map(analysis -> new AnalysisListItem(
+                        String.valueOf(analysis.getId()),
+                        analysis.getSummary(),
+                        analysis.getImgUrl(),
+                        analysis.getCreatedAt()
+                ))
                 .toList();
 
         return new AnalysisPageResponse(analyses, result.hasNext());

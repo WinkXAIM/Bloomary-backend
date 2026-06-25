@@ -80,7 +80,8 @@ class AnalysisControllerTest {
                 .andExpect(jsonPath("$.analyses.length()").value(1))
                 .andExpect(jsonPath("$.analyses[0].id").value("1"))
                 .andExpect(jsonPath("$.analyses[0].summary").value("A bouquet of love and hope"))
-                .andExpect(jsonPath("$.analyses[0].flowerMeanings[0].nameKo").value("장미"))
+                .andExpect(jsonPath("$.analyses[0].imgUrl").doesNotExist())
+                .andExpect(jsonPath("$.analyses[0].flowerMeanings").doesNotExist())
                 .andExpect(jsonPath("$.hasNextPage").value(false));
     }
 

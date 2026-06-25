@@ -3,6 +3,6 @@ package com.flowary.server.analysis.dto;
 import java.util.List;
 
 public record AnalysisPageResponse(
-        List<AnalysisResponse> analyses,
+        List<AnalysisListItem> analyses,
         boolean hasNextPage
 ) {}
