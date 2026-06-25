@@ -1,5 +1,7 @@
 package com.flowary.server.analysis;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +14,8 @@ import java.util.Optional;
 public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
     List<Analysis> findByUserId(Long userId);
+
+    Page<Analysis> findByUserId(Long userId, Pageable pageable);
 
     @Query("SELECT a FROM Analysis a JOIN FETCH a.flowers WHERE a.id = :id")
     Optional<Analysis> findByIdWithFlowers(@Param("id") Long id);

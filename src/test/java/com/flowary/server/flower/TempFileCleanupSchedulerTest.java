@@ -27,7 +27,7 @@ class TempFileCleanupSchedulerTest {
         TempFileStore tempFileStore = mock(TempFileStore.class);
         when(tempFileStore.getTempDir()).thenReturn(tempDir);
 
-        scheduler = new TempFileCleanupScheduler(tempFileStore, 1);
+        scheduler = new TempFileCleanupScheduler(tempFileStore, new UploadProperties(tempDir.toString(), tempDir.toString(), 1));
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.flowary.server.ai.dto.AiCombineResponse;
 import com.flowary.server.ai.dto.FlowerInput;
 import com.flowary.server.analysis.dto.AnalysisFlowerItem;
 import com.flowary.server.analysis.dto.AnalysisFlowerRequest;
+import com.flowary.server.analysis.dto.AnalysisPageResponse;
 import com.flowary.server.analysis.dto.AnalysisResponse;
 import com.flowary.server.flower.FlowerImageStore;
 import com.flowary.server.flower.TempFileStore;
@@ -13,6 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -49,8 +54,11 @@ public class AnalysisService {
         );
     }
 
-    public List<AnalysisResponse> getAnalyses(Long userId) {
-        return analysisRepository.findByUserId(userId).stream()
+    public AnalysisPageResponse getAnalyses(Long userId, int page, int size) {
+        PageRequest pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Analysis> result = analysisRepository.findByUserId(userId, pageable);
+
+        List<AnalysisResponse> analyses = result.getContent().stream()
                 .map(analysis -> {
                     List<AnalysisFlowerItem> flowerItems = analysis.getFlowers().stream()
                             .map(f -> new AnalysisFlowerItem(f.getNameKo(), f.getNameEn(), f.getMeaning()))
@@ -66,6 +74,8 @@ public class AnalysisService {
                     );
                 })
                 .toList();
+
+        return new AnalysisPageResponse(analyses, result.hasNext());
     }
 
     public AnalysisResponse createAnalysis(Long userId, List<AnalysisFlowerRequest> flowerRequests) throws IOException {
